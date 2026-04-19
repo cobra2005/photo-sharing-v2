@@ -1,0 +1,28 @@
+{
+    "$schema": "https://codesandbox.io/schemas/tasks.json",
+    "setupTasks": [
+      {
+        "name": "Cài đặt Backend",
+        "command": "cd backend && npm install"
+      },
+      {
+        "name": "Cài đặt Frontend",
+        "command": "cd frontend && npm install"
+      }
+    ],
+    "tasks": {
+      "start-backend": {
+        "name": "Chạy Backend Server",
+        "command": "cd backend && npm start",
+        "runAtStart": true
+      },
+      "start-frontend": {
+        "name": "Chạy Frontend React",
+        "command": "cd frontend && npm start",
+        "runAtStart": true,
+        "preview": {
+          "port": 3000
+        }
+      }
+    }
+  }
