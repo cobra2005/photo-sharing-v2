@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Divider,
   List,
@@ -12,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import "./styles.css";
 import fetchModel from "../../lib/fetchModelData";
+import { AdvancedFeaturesContext } from "../../AdvancedFeaturesContext";
 
 /**
  * Define UserList, a React component of Project 4.
@@ -19,6 +20,7 @@ import fetchModel from "../../lib/fetchModelData";
 function UserList() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
+  const { advancedFeaturesEnabled } = useContext(AdvancedFeaturesContext);
 
   useEffect(() => {
     fetchModel("/user/list")
@@ -38,14 +40,18 @@ function UserList() {
             <ListItem disablePadding>
               <ListItemButton component={Link} to={`/users/${item._id}`}>
                 <ListItemText primary={`${item.first_name} ${item.last_name}`} />
-                <Badge badgeContent={item.photo_count || 0} color="success" sx={{ mx: 2 }} />
-                <Badge badgeContent={item.comment_count || 0} color="error"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    navigate(`/comments/${item._id}`);
-                  }}
-                />
+                {advancedFeaturesEnabled && (
+                  <>
+                    <Badge badgeContent={item.photo_count || 0} color="success" sx={{ mx: 2 }} />
+                    <Badge badgeContent={item.comment_count || 0} color="error"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        navigate(`/comments/${item._id}`);
+                      }}
+                    />
+                  </>
+                )}
               </ListItemButton>
             </ListItem>
             <Divider />

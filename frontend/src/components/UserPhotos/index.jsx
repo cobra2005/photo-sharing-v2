@@ -1,24 +1,56 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Typography, Card, CardHeader, CardMedia, CardContent, Divider, List, ListItem, ListItemText, Button, Box } from "@mui/material";
+import { Typography, Card, CardHeader, CardMedia, CardContent, Divider, List, ListItem, ListItemText, Button, Box, TextField } from "@mui/material";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import fetchModel from "../../lib/fetchModelData";
 import { AdvancedFeaturesContext } from "../../AdvancedFeaturesContext";
+import axios from "axios";
 
 import "./styles.css";
 
-/**
- * Define UserPhotos, a React component of Project 4.
- */
+const formatDate = (dateString) => {
+  const d = new Date(dateString);
+  const weekday = d.toLocaleString('en-US', { weekday: 'short' });
+  const month = d.toLocaleString('en-US', { month: 'short' });
+  const day = d.getDate();
+  const year = d.getFullYear();
+  const hour = d.getHours().toString().padStart(2, '0');
+  const minute = d.getMinutes().toString().padStart(2, '0');
+  return `${weekday}, ${month} ${day} ${year} ${hour}:${minute}`;
+};
+
+const AddComment = ({ photoId, onCommentAdded }) => {
+  const [comment, setComment] = useState('');
+  const handleAdd = async () => {
+    try {
+      await axios.post(`http://localhost:8081/commentsOfPhoto/${photoId}`, { comment }, { withCredentials: true });
+      setComment('');
+      onCommentAdded();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  return (
+    <Box sx={{ display: 'flex', marginTop: 2, gap: 1 }}>
+      <TextField size="small" fullWidth placeholder="Add a comment..." value={comment} onChange={e => setComment(e.target.value)} />
+      <Button variant="contained" onClick={handleAdd} disabled={!comment.trim()}>Post</Button>
+    </Box>
+  );
+};
+
 function UserPhotos() {
   const { userId, photoId } = useParams();
   const navigate = useNavigate();
   const [photos, setPhotos] = useState(null);
   const { advancedFeaturesEnabled } = useContext(AdvancedFeaturesContext);
 
-  useEffect(() => {
+  const loadPhotos = () => {
     fetchModel(`/photosOfUser/${userId}`)
       .then(data => setPhotos(data))
       .catch(err => console.error(err));
+  };
+
+  useEffect(() => {
+    loadPhotos();
   }, [userId]);
 
   if (!photos) {
@@ -41,11 +73,11 @@ function UserPhotos() {
       <div style={{ padding: 16 }}>
         <Card sx={{ marginBottom: 4 }}>
           <CardHeader
-            title={<Typography variant="subtitle1" color="textSecondary">{photo.date_time}</Typography>}
+            title={<Typography variant="subtitle1" color="textSecondary">{formatDate(photo.date_time)}</Typography>}
           />
           <CardMedia
             component="img"
-            image={`/images/${photo.file_name}`}
+            image={`http://localhost:8081/images/${photo.file_name}`}
             alt={photo.file_name}
             sx={{ maxWidth: "100%", objectFit: "contain" }}
           />
@@ -80,7 +112,7 @@ function UserPhotos() {
                               {comment.user.first_name} {comment.user.last_name}
                             </Link>
                             <span style={{ color: "gray", fontSize: "0.85em", marginLeft: 8 }}>
-                              {comment.date_time}
+                              {formatDate(comment.date_time)}
                             </span>
                           </Typography>
                         }
@@ -100,6 +132,7 @@ function UserPhotos() {
                 No comments yet.
               </Typography>
             )}
+            <AddComment photoId={photo._id} onCommentAdded={loadPhotos} />
           </CardContent>
         </Card>
       </div>
@@ -111,11 +144,11 @@ function UserPhotos() {
       {photos.map(photo => (
         <Card key={photo._id} sx={{ marginBottom: 4 }}>
           <CardHeader
-            title={<Typography variant="subtitle1" color="textSecondary">{photo.date_time}</Typography>}
+            title={<Typography variant="subtitle1" color="textSecondary">{formatDate(photo.date_time)}</Typography>}
           />
           <CardMedia
             component="img"
-            image={`/images/${photo.file_name}`}
+            image={`http://localhost:8081/images/${photo.file_name}`}
             alt={photo.file_name}
             sx={{ maxWidth: "100%", objectFit: "contain" }}
           />
@@ -134,7 +167,7 @@ function UserPhotos() {
                               {comment.user.first_name} {comment.user.last_name}
                             </Link>
                             <span style={{ color: "gray", fontSize: "0.85em", marginLeft: 8 }}>
-                              {comment.date_time}
+                              {formatDate(comment.date_time)}
                             </span>
                           </Typography>
                         }
@@ -154,6 +187,7 @@ function UserPhotos() {
                 No comments yet.
               </Typography>
             )}
+            <AddComment photoId={photo._id} onCommentAdded={loadPhotos} />
           </CardContent>
         </Card>
       ))}
