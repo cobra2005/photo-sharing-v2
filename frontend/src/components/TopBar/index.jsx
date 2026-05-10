@@ -35,7 +35,7 @@ function TopBar({ user, onLogout }) {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:8081/admin/logout", {}, { withCredentials: true });
+      await axios.post("/admin/logout", {}, { withCredentials: true });
       onLogout();
       navigate("/login-register");
     } catch (e) {
@@ -48,7 +48,7 @@ function TopBar({ user, onLogout }) {
     const formData = new FormData();
     formData.append("photo", uploadFile);
     try {
-      await axios.post("http://localhost:8081/photos/new", formData, {
+      await axios.post("/photos/new", formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" }
       });

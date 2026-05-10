@@ -7,7 +7,7 @@ import models from "../modelData/models";
  * @returns {Promise}       A Promise that resolves with the response data.
  */
 async function fetchModel(url) {
-  const response = await fetch(`http://localhost:8081${url}`, {
+  const response = await fetch(url, {
     credentials: "include"
   });
   if (!response.ok) {

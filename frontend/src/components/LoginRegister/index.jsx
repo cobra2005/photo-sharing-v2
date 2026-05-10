@@ -19,7 +19,7 @@ const LoginRegister = ({ onLogin }) => {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post('http://localhost:8081/admin/login', { login_name: loginName }, {
+      const res = await axios.post('/admin/login', { login_name: loginName }, {
         withCredentials: true
       });
       onLogin(res.data);
@@ -34,7 +34,7 @@ const LoginRegister = ({ onLogin }) => {
       return;
     }
     try {
-      await axios.post('http://localhost:8081/user', {
+      await axios.post('/user', {
         login_name: regLoginName,
         password: regPassword,
         first_name: regFirstName,

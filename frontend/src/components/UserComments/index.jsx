@@ -53,7 +53,7 @@ function UserComments() {
               <ListItemAvatar>
                 <Avatar
                   variant="square"
-                  src={`http://localhost:8081/images/${c.photo_file_name}`}
+                  src={`/images/${c.photo_file_name}`}
                   alt={c.photo_file_name}
                   sx={{ width: 80, height: 80, mr: 2, '& img': { objectFit: 'contain' } }}
                 />

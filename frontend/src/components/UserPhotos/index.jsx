@@ -22,7 +22,7 @@ const AddComment = ({ photoId, onCommentAdded }) => {
   const [comment, setComment] = useState('');
   const handleAdd = async () => {
     try {
-      await axios.post(`http://localhost:8081/commentsOfPhoto/${photoId}`, { comment }, { withCredentials: true });
+      await axios.post(`/commentsOfPhoto/${photoId}`, { comment }, { withCredentials: true });
       setComment('');
       onCommentAdded();
     } catch (e) {
@@ -77,7 +77,7 @@ function UserPhotos() {
           />
           <CardMedia
             component="img"
-            image={`http://localhost:8081/images/${photo.file_name}`}
+            image={`/images/${photo.file_name}`}
             alt={photo.file_name}
             sx={{ maxWidth: "100%", objectFit: "contain" }}
           />
@@ -148,7 +148,7 @@ function UserPhotos() {
           />
           <CardMedia
             component="img"
-            image={`http://localhost:8081/images/${photo.file_name}`}
+            image={`/images/${photo.file_name}`}
             alt={photo.file_name}
             sx={{ maxWidth: "100%", objectFit: "contain" }}
           />
