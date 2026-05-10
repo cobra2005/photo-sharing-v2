@@ -33,9 +33,10 @@ mongoose.connect(mongoURI)
 // Auth Middleware to protect routes
 const requireAuth = (req, res, next) => {
   if (
-    req.path === '/admin/login' || 
-    req.path === '/admin/logout' || 
-    req.path === '/user' || 
+    req.path === '/' ||
+    req.path === '/admin/login' ||
+    req.path === '/admin/logout' ||
+    req.path === '/user' ||
     req.path.startsWith('/images')
   ) {
     return next();
@@ -59,11 +60,11 @@ app.post('/admin/login', async (req, res) => {
     const { login_name } = req.body;
     const user = await User.findOne({ login_name });
     if (!user) return res.status(400).json({ message: 'Login failed: User not found' });
-    
+
     req.session.userId = user._id;
     req.session.login_name = user.login_name;
     req.session.first_name = user.first_name;
-    
+
     res.json({ _id: user._id, first_name: user.first_name, last_name: user.last_name, login_name: user.login_name });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -85,20 +86,20 @@ app.post('/admin/logout', (req, res) => {
 app.post('/user', async (req, res) => {
   try {
     const { login_name, password, first_name, last_name, location, description, occupation } = req.body;
-    
+
     if (!login_name || !password || !first_name || !last_name) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
-    
+
     const existing = await User.findOne({ login_name });
     if (existing) {
       return res.status(400).json({ message: 'Login name already exists' });
     }
-    
+
     const newUser = await User.create({
       login_name, password, first_name, last_name, location, description, occupation
     });
-    
+
     res.json({ _id: newUser._id, login_name: newUser.login_name });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -110,12 +111,12 @@ const upload = multer({ dest: path.join(__dirname, 'images') });
 app.post('/photos/new', upload.single('photo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'No file provided' });
   if (!req.session.userId) return res.status(401).json({ message: 'Unauthorized' });
-  
+
   try {
     const ext = path.extname(req.file.originalname) || '';
     const newName = req.file.filename + ext;
     fs.renameSync(req.file.path, path.join(req.file.destination, newName));
-    
+
     const newPhoto = await Photo.create({
       file_name: newName,
       date_time: new Date(),
@@ -131,22 +132,22 @@ app.post('/photos/new', upload.single('photo'), async (req, res) => {
 // Add a comment to a photo
 app.post('/commentsOfPhoto/:photo_id', async (req, res) => {
   if (!req.session.userId) return res.status(401).json({ message: 'Unauthorized' });
-  
+
   const { comment } = req.body;
   if (!comment || comment.trim() === '') {
     return res.status(400).json({ message: 'Empty comment' });
   }
-  
+
   try {
     const photo = await Photo.findById(req.params.photo_id);
     if (!photo) return res.status(400).json({ message: 'Photo not found' });
-    
+
     photo.comments.push({
       comment: comment,
       user_id: req.session.userId,
       date_time: new Date()
     });
-    
+
     await photo.save();
     res.json(photo);
   } catch (err) {
